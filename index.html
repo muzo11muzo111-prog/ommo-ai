@@ -3,25 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ommo AI - دردشة ذكية</title>
+    <title>Ommo AI - المساعد الذكي</title>
     <style>
-        * { box-sizing: border-box; }
-        body { font-family: sans-serif; background-color: #121212; color: #eee; display: flex; flex-direction: column; height: 100vh; margin: 0; }
-        header { background-color: #1f1f1f; padding: 0.8rem; text-align: center; border-bottom: 1px solid #333; }
-        h1 { margin: 0; font-size: 1.3rem; color: #ff9800; }
-        #chat-container { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 12px; }
-        .message { max-width: 85%; padding: 12px; border-radius: 12px; line-height: 1.5; word-wrap: break-word; font-size: 0.95rem; }
-        .user-message { align-self: flex-end; background-color: #ff9800; color: #121212; border-bottom-right-radius: 2px; }
-        .ai-message { align-self: flex-start; background-color: #2d2d2d; color: #eee; border-bottom-left-radius: 2px; }
-        .error-message { align-self: center; background-color: #d32f2f; color: white; padding: 8px 12px; border-radius: 8px; font-size: 0.85rem; }
-        #input-area { background-color: #1f1f1f; padding: 0.8rem; display: flex; gap: 8px; border-top: 1px solid #333; }
-        input[type="text"] { flex: 1; padding: 12px; border: none; border-radius: 8px; background-color: #2d2d2d; color: #eee; font-size: 1rem; }
-        input[type="text"]:focus { outline: 2px solid #ff9800; }
-        button { padding: 0 16px; border: none; border-radius: 8px; background-color: #ff9800; color: #121212; font-weight: bold; cursor: pointer; font-size: 1rem; }
-        button:hover { background-color: #f57c00; }
-        button:disabled { background-color: #555; cursor: not-allowed; }
-        #api-key-section { background-color: #181818; padding: 0.5rem 1rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #333; font-size: 0.8rem; color: #aaa; }
-        #api-key-input { background: #2d2d2d; border: 1px solid #444; color: #fff; padding: 4px 8px; border-radius: 4px; width: 60%; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #0f0f0f; color: #f1f1f1; display: flex; flex-direction: column; height: 100vh; }
+        header { background-color: #1a1a1a; padding: 15px; text-align: center; border-bottom: 1px solid #2a2a2a; }
+        h1 { font-size: 1.2rem; color: #ff9800; font-weight: 700; }
+        
+        #settings-bar { background-color: #141414; padding: 10px 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #2a2a2a; font-size: 0.85rem; color: #888; }
+        #api-key-input { background: #222; border: 1px solid #333; color: #fff; padding: 6px 10px; border-radius: 6px; width: 65%; font-size: 0.85rem; }
+        #api-key-input:focus { outline: 1px solid #ff9800; }
+
+        #chat-container { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; }
+        .message { max-width: 85%; padding: 12px 16px; border-radius: 14px; line-height: 1.6; font-size: 0.95rem; word-break: break-word; }
+        .user-message { align-self: flex-end; background-color: #ff9800; color: #000; border-bottom-right-radius: 3px; font-weight: 500; }
+        .ai-message { align-self: flex-start; background-color: #212121; color: #f1f1f1; border-bottom-left-radius: 3px; border: 1px solid #2c2c2c; }
+        .error-message { align-self: center; background-color: #ffebee; color: #c62828; padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; border: 1px solid #ef9a9a; }
+
+        #input-area { background-color: #1a1a1a; padding: 12px 15px; display: flex; gap: 10px; border-top: 1px solid #2a2a2a; }
+        #user-input { flex: 1; padding: 12px; border: 1px solid #333; border-radius: 8px; background-color: #222; color: #fff; font-size: 0.95rem; }
+        #user-input:focus { outline: 1px solid #ff9800; }
+        #send-btn { padding: 0 20px; border: none; border-radius: 8px; background-color: #ff9800; color: #000; font-weight: bold; cursor: pointer; font-size: 0.95rem; transition: background 0.2s; }
+        #send-btn:hover { background-color: #f57c00; }
+        #send-btn:disabled { background-color: #444; color: #777; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -30,17 +34,17 @@
     <h1>Ommo AI</h1>
 </header>
 
-<div id="api-key-section">
-    <span>مفتاح API:</span>
-    <input type="password" id="api-key-input" placeholder="أدخل مفتاح Gemini هنا">
+<div id="settings-bar">
+    <span>مفتاح Gemini API:</span>
+    <input type="password" id="api-key-input" placeholder="الصق المفتاح هنا (محفوظ محلياً)">
 </div>
 
 <div id="chat-container">
-    <div class="message ai-message">أهلاً بك! أنا Ommo، كيف يمكنني مساعدتك اليوم؟</div>
+    <div class="message ai-message">أهلاً بك يا محمد! أنا Ommo، جاهز لمساعدتك ومتابعة أفكارك البرمجية والعلمية. كيف أخدمك اليوم؟</div>
 </div>
 
 <div id="input-area">
-    <input type="text" id="user-input" placeholder="اكتب رسالتك هنا..." autocomplete="off">
+    <input type="text" id="user-input" placeholder="اكتب رسالتك أو سؤالك هنا..." autocomplete="off">
     <button id="send-btn">إرسال</button>
 </div>
 
@@ -50,14 +54,14 @@
     const sendBtn = document.getElementById('send-btn');
     const apiKeyInput = document.getElementById('api-key-input');
 
-    // Load API key from localStorage
-    if (localStorage.getItem('gemini_api_key')) {
-        apiKeyInput.value = localStorage.getItem('gemini_api_key');
+    // استعادة المفتاح المخزن مسبقاً في المتصفح إن وجد
+    if (localStorage.getItem('ommo_gemini_key')) {
+        apiKeyInput.value = localStorage.getItem('ommo_gemini_key');
     }
 
-    // Save API key to localStorage when changed
+    // حفظ المفتاح تلقائياً عند إدخاله
     apiKeyInput.addEventListener('input', () => {
-        localStorage.setItem('gemini_api_key', apiKeyInput.value.trim());
+        localStorage.setItem('ommo_gemini_key', apiKeyInput.value.trim());
     });
 
     sendBtn.addEventListener('click', sendMessage);
@@ -66,18 +70,18 @@
     });
 
     function appendMessage(sender, text) {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('message', sender === 'user' ? 'user-message' : 'ai-message');
-        messageDiv.textContent = text;
-        chatContainer.appendChild(messageDiv);
+        const div = document.createElement('div');
+        div.classList.add('message', sender === 'user' ? 'user-message' : 'ai-message');
+        div.textContent = text;
+        chatContainer.appendChild(div);
         chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
     function appendError(text) {
-        const errorDiv = document.createElement('div');
-        errorDiv.classList.add('error-message');
-        errorDiv.textContent = text;
-        chatContainer.appendChild(errorDiv);
+        const div = document.createElement('div');
+        div.classList.add('error-message');
+        div.textContent = text;
+        chatContainer.appendChild(div);
         chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
@@ -87,7 +91,7 @@
 
         if (!text) return;
         if (!apiKey) {
-            appendError('الرجاء إدخال مفتاح Gemini API في الأعلى أولاً.');
+            appendError('الرجاء إدخال مفتاح Gemini API في الشريط العلوي أولاً.');
             return;
         }
 
@@ -96,10 +100,11 @@
         sendBtn.disabled = true;
         sendBtn.textContent = '...';
 
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        // رابط الاتصال المحدث والرسمي لنموذج فلاش المستقر
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
         try {
-            const response = await fetch(url, {
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -110,18 +115,17 @@
             const data = await response.json();
 
             if (response.ok && data.candidates && data.candidates[0].content.parts[0].text) {
-                const aiResponse = data.candidates[0].content.parts[0].text;
-                appendMessage('ai', aiResponse);
+                const reply = data.candidates[0].content.parts[0].text;
+                appendMessage('ai', reply);
             } else {
-                let errorMsg = 'حدث خطأ في استجابة الخادم.';
+                let errDesc = 'خطأ غير معروف من خادم Google.';
                 if (data.error && data.error.message) {
-                    errorMsg = `خطأ: ${data.error.message}`;
+                    errDesc = data.error.message;
                 }
-                appendError(errorMsg);
+                appendError(`فشل الاتصال: ${errDesc}`);
             }
-
-        } catch (error) {
-            appendError('تعذر الاتصال بالخادم، تحقق من الاتصال بالإنترنت.');
+        } catch (err) {
+            appendError('تعذر الاتصال بالشبكة، تحقق من اتصال الإنترنت.');
         } finally {
             sendBtn.disabled = false;
             sendBtn.textContent = 'إرسال';
