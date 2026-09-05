@@ -3,126 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ommo AI</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Ommo AI - دردشة ذكية</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: sans-serif; background-color: #121212; color: #eee; display: flex; flex-direction: column; height: 100vh; margin: 0; }
+        header { background-color: #1f1f1f; padding: 0.8rem; text-align: center; border-bottom: 1px solid #333; }
+        h1 { margin: 0; font-size: 1.3rem; color: #ff9800; }
+        #chat-container { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 12px; }
+        .message { max-width: 85%; padding: 12px; border-radius: 12px; line-height: 1.5; word-wrap: break-word; font-size: 0.95rem; }
+        .user-message { align-self: flex-end; background-color: #ff9800; color: #121212; border-bottom-right-radius: 2px; }
+        .ai-message { align-self: flex-start; background-color: #2d2d2d; color: #eee; border-bottom-left-radius: 2px; }
+        .error-message { align-self: center; background-color: #d32f2f; color: white; padding: 8px 12px; border-radius: 8px; font-size: 0.85rem; }
+        #input-area { background-color: #1f1f1f; padding: 0.8rem; display: flex; gap: 8px; border-top: 1px solid #333; }
+        input[type="text"] { flex: 1; padding: 12px; border: none; border-radius: 8px; background-color: #2d2d2d; color: #eee; font-size: 1rem; }
+        input[type="text"]:focus { outline: 2px solid #ff9800; }
+        button { padding: 0 16px; border: none; border-radius: 8px; background-color: #ff9800; color: #121212; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        button:hover { background-color: #f57c00; }
+        button:disabled { background-color: #555; cursor: not-allowed; }
+        #api-key-section { background-color: #181818; padding: 0.5rem 1rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #333; font-size: 0.8rem; color: #aaa; }
+        #api-key-input { background: #2d2d2d; border: 1px solid #444; color: #fff; padding: 4px 8px; border-radius: 4px; width: 60%; }
+    </style>
 </head>
-<body class="bg-[#121212] text-white h-screen flex flex-col justify-between overflow-hidden">
+<body>
 
-    <!-- شريط العرض العلوي -->
-    <header class="flex items-center justify-between px-4 py-3 bg-[#1e1e1e] border-b border-neutral-800 shrink-0">
-        <button class="text-neutral-400 hover:text-white text-xl">&#9776;</button>
-        
-        <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-full bg-[#f97316] flex items-center justify-center font-bold text-white shadow-md">&#9712;</div>
-            <span class="font-bold text-lg tracking-wider">ommo</span>
-        </div>
+<header>
+    <h1>Ommo AI</h1>
+</header>
 
-        <button onclick="toggleIncognito()" id="incognitoBtn" class="text-neutral-400 hover:text-[#f97316] transition text-sm px-3 py-1 border border-neutral-700 rounded-lg">
-            مخفي 🕶️
-        </button>
-    </header>
+<div id="api-key-section">
+    <span>مفتاح API:</span>
+    <input type="password" id="api-key-input" placeholder="أدخل مفتاح Gemini هنا">
+</div>
 
-    <!-- صندوق المحادثة والرسائل -->
-    <main id="chatHistory" class="flex-1 overflow-y-auto p-4 space-y-4 max-w-2xl w-full mx-auto">
-        <div class="flex justify-start">
-            <div class="bg-[#1e1e1e] border border-neutral-800 p-3 rounded-2xl max-w-[80%] text-sm text-neutral-200">
-                أهلاً بك، أنا Ommo صممني المبدع محمد طراف. كيف يمكنني مساعدتك اليوم؟
-            </div>
-        </div>
-    </main>
+<div id="chat-container">
+    <div class="message ai-message">أهلاً بك! أنا Ommo، كيف يمكنني مساعدتك اليوم؟</div>
+</div>
 
-    <!-- شريط الإدخال السفلي -->
-    <footer class="p-4 bg-[#121212] border-t border-neutral-800 shrink-0">
-        <div class="max-w-2xl mx-auto flex items-center gap-2 bg-[#1e1e1e] border border-neutral-700 rounded-full px-4 py-2 shadow-lg">
-            
-            <!-- حقل الكتابة -->
-            <input type="text" id="chatInput" placeholder="اكتب رسالتك هنا..." class="flex-1 bg-transparent border-none focus:outline-none text-sm text-white placeholder-neutral-500 px-2">
+<div id="input-area">
+    <input type="text" id="user-input" placeholder="اكتب رسالتك هنا..." autocomplete="off">
+    <button id="send-btn">إرسال</button>
+</div>
 
-            <!-- زر الإرسال البرتقالي -->
-            <button type="button" onclick="sendMessage()" class="bg-[#f97316] hover:bg-orange-600 text-white p-2.5 rounded-full transition flex items-center justify-center cursor-pointer">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-            </button>
-        </div>
-    </footer>
+<script>
+    const chatContainer = document.getElementById('chat-container');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
+    const apiKeyInput = document.getElementById('api-key-input');
 
-    <script>
-        let sessionId = "user_" + Math.random().toString(36).substring(2);
-        let isIncognito = false;
+    // Load API key from localStorage
+    if (localStorage.getItem('gemini_api_key')) {
+        apiKeyInput.value = localStorage.getItem('gemini_api_key');
+    }
 
-        function toggleIncognito() {
-            isIncognito = !isIncognito;
-            const btn = document.getElementById('incognitoBtn');
-            if (isIncognito) {
-                btn.style.borderColor = "#f97316";
-                btn.style.color = "#f97316";
-                sessionId = "incognito_" + Math.random().toString(36).substring(2);
-                alert("تم تفعيل التصفح المخفي!");
+    // Save API key to localStorage when changed
+    apiKeyInput.addEventListener('input', () => {
+        localStorage.setItem('gemini_api_key', apiKeyInput.value.trim());
+    });
+
+    sendBtn.addEventListener('click', sendMessage);
+    userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+
+    function appendMessage(sender, text) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', sender === 'user' ? 'user-message' : 'ai-message');
+        messageDiv.textContent = text;
+        chatContainer.appendChild(messageDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function appendError(text) {
+        const errorDiv = document.createElement('div');
+        errorDiv.classList.add('error-message');
+        errorDiv.textContent = text;
+        chatContainer.appendChild(errorDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    async function sendMessage() {
+        const text = userInput.value.trim();
+        const apiKey = apiKeyInput.value.trim();
+
+        if (!text) return;
+        if (!apiKey) {
+            appendError('الرجاء إدخال مفتاح Gemini API في الأعلى أولاً.');
+            return;
+        }
+
+        userInput.value = '';
+        appendMessage('user', text);
+        sendBtn.disabled = true;
+        sendBtn.textContent = '...';
+
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: text }] }]
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.candidates && data.candidates[0].content.parts[0].text) {
+                const aiResponse = data.candidates[0].content.parts[0].text;
+                appendMessage('ai', aiResponse);
             } else {
-                btn.style.borderColor = "";
-                btn.style.color = "";
-                sessionId = "user_" + Math.random().toString(36).substring(2);
-                alert("تم إيقاف التصفح المخفي.");
+                let errorMsg = 'حدث خطأ في استجابة الخادم.';
+                if (data.error && data.error.message) {
+                    errorMsg = `خطأ: ${data.error.message}`;
+                }
+                appendError(errorMsg);
             }
+
+        } catch (error) {
+            appendError('تعذر الاتصال بالخادم، تحقق من الاتصال بالإنترنت.');
+        } finally {
+            sendBtn.disabled = false;
+            sendBtn.textContent = 'إرسال';
+            userInput.focus();
         }
+    }
+</script>
 
-        async function sendMessage() {
-            const input = document.getElementById('chatInput');
-            const history = document.getElementById('chatHistory');
-            const msg = input.value.trim();
-            
-            if (!msg) return;
-
-            // 1. عرض رسالة المستخدم فوراً باليمين
-            history.innerHTML += `
-                <div class="flex justify-end">
-                    <div class="bg-[#f97316] text-white p-3 rounded-2xl max-w-[80%] text-sm shadow-md">
-                        ${msg}
-                    </div>
-                </div>
-            `;
-            input.value = '';
-            history.scrollTop = history.scrollHeight;
-
-            try {
-                // 2. إرسال الطلب للسيرفر
-                const res = await fetch('/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ session_id: sessionId, message: msg })
-                });
-                const data = await res.json();
-
-                // 3. عرض رد Ommo باليسار
-                history.innerHTML += `
-                    <div class="flex justify-start">
-                        <div class="bg-[#1e1e1e] border border-neutral-800 p-3 rounded-2xl max-w-[80%] text-sm text-neutral-200 shadow-md">
-                            ${data.reply}
-                        </div>
-                    </div>
-                `;
-                history.scrollTop = history.scrollHeight;
-            } catch (err) {
-                // رد احتياطي في حال بطء الاتصال
-                history.innerHTML += `
-                    <div class="flex justify-start">
-                        <div class="bg-[#1e1e1e] border border-neutral-800 p-3 rounded-2xl max-w-[80%] text-sm text-neutral-200">
-                            أهلاً بك، أنا Ommo صممني محمد طراف وجاهز لمتابعة الدردشة معك!
-                        </div>
-                    </div>
-                `;
-                history.scrollTop = history.scrollHeight;
-            }
-        }
-
-        // دعم زر Enter للإرسال المباشر
-        document.getElementById('chatInput').addEventListener('keydown', function (e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
-    </script>
 </body>
 </html>
